@@ -439,8 +439,24 @@
 
     @media (max-width: 600px) {
       .hero h1 { font-size: 2.2rem; }
-      .hero-stats { gap: 1.5rem; }
+      .hero-stats { gap: 1.5rem; flex-wrap: wrap; justify-content: space-around; }
       .nav-links { display: none; }
+      .hero { padding: 5rem 1rem 3rem; }
+      .search-wrap { padding: 0 1rem; }
+      .section-header { padding: 0 1rem; }
+      .cards-grid { grid-template-columns: 1fr; gap: 1rem; padding: 0 1rem; }
+      .card { padding: 1.2rem; }
+      .card-title { font-size: 1rem; }
+      .card-desc { font-size: 0.85rem; }
+      main { padding: 0; }
+      footer { padding: 2rem 1rem; text-align: center; }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 1.8rem; }
+      .hero p { font-size: 1rem; }
+      .stat-num { font-size: 1.5rem; }
+      .stat-label { font-size: 0.8rem; }
     }
   </style>
 </head>
