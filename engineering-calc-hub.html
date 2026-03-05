@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EngCalc Hub — Engineering Mathematics Calculators</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0d14;
+      --surface: #111520;
+      --card: #161b27;
+      --border: #1f2840;
+      --accent1: #4f8aff;
+      --accent2: #00d4aa;
+      --accent3: #ff6b6b;
+      --accent4: #ffbe5c;
+      --accent5: #b06fff;
+      --accent6: #ff8c42;
+      --text: #e8edf5;
+      --muted: #6b7a99;
+      --glow1: rgba(79,138,255,0.18);
+      --glow2: rgba(0,212,170,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(79,138,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,138,255,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+    .orb1 { width: 400px; height: 400px; background: rgba(79,138,255,0.12); top: -100px; left: -100px; animation-delay: 0s; }
+    .orb2 { width: 300px; height: 300px; background: rgba(0,212,170,0.1); bottom: 10%; right: -50px; animation-delay: -4s; }
+    .orb3 { width: 250px; height: 250px; background: rgba(176,111,255,0.08); top: 50%; left: 40%; animation-delay: -7s; }
+
+    @keyframes drift {
+      0% { transform: translate(0,0) scale(1); }
+      100% { transform: translate(30px, 40px) scale(1.08); }
+    }
+
+    /* Nav */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,13,20,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-logo span {
+      color: var(--muted);
+      font-weight: 400;
+      font-size: 0.85rem;
+      font-family: 'DM Mono', monospace;
+      -webkit-text-fill-color: var(--muted);
+      margin-left: 8px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 7rem 2rem 4rem;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(79,138,255,0.1);
+      border: 1px solid rgba(79,138,255,0.3);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent1);
+      margin-bottom: 1.8rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent2);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.4); }
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.6rem, 6vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -2px;
+      margin-bottom: 1.2rem;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent1) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      line-height: 1.7;
+      max-width: 580px;
+      margin: 0 auto 2.5rem;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Search bar */
+    .search-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 520px;
+      margin: 0 auto 4rem;
+      padding: 0 2rem;
+      animation: fadeUp 0.6s 0.35s ease both;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.85rem 1rem 0.85rem 3rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent1);
+      box-shadow: 0 0 0 3px rgba(79,138,255,0.15);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 2.9rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    /* Main content */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem 6rem;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 4rem;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-icon {
+      width: 42px; height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .section-title-group h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .section-title-group p {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-family: 'DM Mono', monospace;
+      margin-top: 2px;
+    }
+
+    .section-divider {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+
+    /* Cards grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.3rem 1.4rem;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+      border-radius: 14px;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card-emoji {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .card-body { flex: 1; min-width: 0; }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-desc {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .card-arrow {
+      flex-shrink: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      align-self: center;
+      transition: transform 0.2s, color 0.2s;
+    }
+
+    .card:hover .card-arrow { transform: translateX(3px); }
+
+    /* Color theming per section */
+    .s1 .section-icon { background: rgba(79,138,255,0.15); }
+    .s1 .card:hover { border-color: rgba(79,138,255,0.5); box-shadow: 0 12px 36px rgba(79,138,255,0.12); }
+    .s1 .card:hover .card-arrow { color: var(--accent1); }
+    .s1 .card::before { background: radial-gradient(ellipse at top left, rgba(79,138,255,0.06), transparent 70%); }
+
+    .s2 .section-icon { background: rgba(0,212,170,0.15); }
+    .s2 .card:hover { border-color: rgba(0,212,170,0.5); box-shadow: 0 12px 36px rgba(0,212,170,0.1); }
+    .s2 .card:hover .card-arrow { color: var(--accent2); }
+    .s2 .card::before { background: radial-gradient(ellipse at top left, rgba(0,212,170,0.06), transparent 70%); }
+
+    .s3 .section-icon { background: rgba(176,111,255,0.15); }
+    .s3 .card:hover { border-color: rgba(176,111,255,0.5); box-shadow: 0 12px 36px rgba(176,111,255,0.1); }
+    .s3 .card:hover .card-arrow { color: var(--accent5); }
+    .s3 .card::before { background: radial-gradient(ellipse at top left, rgba(176,111,255,0.06), transparent 70%); }
+
+    .s4 .section-icon { background: rgba(255,107,107,0.15); }
+    .s4 .card:hover { border-color: rgba(255,107,107,0.5); box-shadow: 0 12px 36px rgba(255,107,107,0.1); }
+    .s4 .card:hover .card-arrow { color: var(--accent3); }
+    .s4 .card::before { background: radial-gradient(ellipse at top left, rgba(255,107,107,0.06), transparent 70%); }
+
+    .s5 .section-icon { background: rgba(255,190,92,0.15); }
+    .s5 .card:hover { border-color: rgba(255,190,92,0.5); box-shadow: 0 12px 36px rgba(255,190,92,0.1); }
+    .s5 .card:hover .card-arrow { color: var(--accent4); }
+    .s5 .card::before { background: radial-gradient(ellipse at top left, rgba(255,190,92,0.06), transparent 70%); }
+
+    .s6 .section-icon { background: rgba(255,140,66,0.15); }
+    .s6 .card:hover { border-color: rgba(255,140,66,0.5); box-shadow: 0 12px 36px rgba(255,140,66,0.1); }
+    .s6 .card:hover .card-arrow { color: var(--accent6); }
+    .s6 .card::before { background: radial-gradient(ellipse at top left, rgba(255,140,66,0.06), transparent 70%); }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-family: 'DM Mono', monospace;
+    }
+
+    footer a { color: var(--accent1); text-decoration: none; }
+
+    /* Hidden by search */
+    .card.hidden { display: none; }
+    .section.empty { display: none; }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 2.2rem; }
+      .hero-stats { gap: 1.5rem; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background effects -->
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">EngCalc<span>// Hub</span></div>
+    <ul class="nav-links">
+      <li><a href="#numerical">Numerical</a></li>
+      <li><a href="#calculus">Calculus</a></li>
+      <li><a href="#probability">Probability</a></li>
+      <li><a href="#linear">Linear Algebra</a></li>
+      <li><a href="#ode">ODE</a></li>
+      <li><a href="#transforms">Transforms</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">Engineering Mathematics Calculator Hub</div>
+    <h1>Your complete toolkit for<br/><em>Engineering Maths</em></h1>
+    <p>Curated collection of online calculators across Numerical Methods, Calculus, Probability, Linear Algebra, ODEs, and more — all in one place.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">6</div><div class="stat-label">Topics</div></div>
+      <div class="stat"><div class="stat-num">40+</div><div class="stat-label">Calculators</div></div>
+      <div class="stat"><div class="stat-num">Free</div><div class="stat-label">Access</div></div>
+    </div>
+  </section>
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="text" id="search" placeholder="Search calculators… e.g. Gauss Jacobi, Simpson's Rule" />
+  </div>
+
+  <!-- Main Content -->
+  <main>
+
+    <!-- 1. Numerical Methods -->
+    <div class="section s1" id="numerical">
+      <div class="section-header">
+        <div class="section-icon">📐</div>
+        <div class="section-title-group">
+          <h2>Numerical Methods</h2>
+          <p>Root finding, interpolation, integration & linear system solvers</p>
+        </div>
+        <div class="section-divider"></div>
+      </div>
+      <div class="cards-grid">
+
+        <a class="card" href="https://atozmath.com/CONM/GaussE.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">🔢</div>
+          <div class="card-body">
+            <div class="card-title">Gauss-Jacobi Method</div>
+            <div class="card-desc">Iterative method for solving linear systems — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/CONM/GaussSeidel.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">🔄</div>
+          <div class="card-body">
+            <div class="card-title">Gauss-Seidel Method</div>
+            <div class="card-desc">Improved iterative solver for linear equations — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/CONM/Bisection.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">🎯</div>
+          <div class="card-body">
+            <div class="card-title">Bisection Method</div>
+            <div class="card-desc">Root finding by interval halving — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/CONM/NewtonRaphson.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">📉</div>
+          <div class="card-body">
+            <div class="card-title">Newton-Raphson Method</div>
+            <div class="card-desc">Fast root finding using derivatives — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/CONM/SecantMethod.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">📏</div>
+          <div class="card-body">
+            <div class="card-title">Secant Method</div>
+            <div class="card-desc">Root finding without computing derivatives — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/CONM/LagrangeInterpolation.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">📈</div>
+          <div class="card-body">
+            <div class="card-title">Lagrange Interpolation</div>
+            <div class="card-desc">Polynomial interpolation through data points — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/CONM/NewtonForward.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">🔭</div>
+          <div class="card-body">
+            <div class="card-title">Newton's Forward/Backward Interpolation</div>
+            <div class="card-desc">Finite difference interpolation — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/CONM/Simpson.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">∫</div>
+          <div class="card-body">
+            <div class="card-title">Simpson's Rule</div>
+            <div class="card-desc">Numerical integration using parabolic arcs — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/CONM/Trapezoidal.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">⬛</div>
+          <div class="card-body">
+            <div class="card-title">Trapezoidal Rule</div>
+            <div class="card-desc">Numerical integration using trapezoids — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/CONM/RungeKutta.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">🚀</div>
+          <div class="card-body">
+            <div class="card-title">Runge-Kutta Methods</div>
+            <div class="card-desc">Numerical ODE solver (RK2, RK4) — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- 2. Calculus -->
+    <div class="section s2" id="calculus">
+      <div class="section-header">
+        <div class="section-icon">∫</div>
+        <div class="section-title-group">
+          <h2>Calculus</h2>
+          <p>Derivatives, integrals, limits, series and multivariable calculus</p>
+        </div>
+        <div class="section-divider"></div>
+      </div>
+      <div class="cards-grid">
+
+        <a class="card" href="https://www.derivative-calculator.net/" target="_blank" rel="noopener">
+          <div class="card-emoji">d/dx</div>
+          <div class="card-body">
+            <div class="card-title">Derivative Calculator</div>
+            <div class="card-desc">Step-by-step differentiation with rules shown — derivative-calculator.net</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.integral-calculator.com/" target="_blank" rel="noopener">
+          <div class="card-emoji">∫</div>
+          <div class="card-body">
+            <div class="card-title">Integral Calculator</div>
+            <div class="card-desc">Definite & indefinite integrals with steps — integral-calculator.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.symbolab.com/solver/limit-calculator" target="_blank" rel="noopener">
+          <div class="card-emoji">lim</div>
+          <div class="card-body">
+            <div class="card-title">Limit Calculator</div>
+            <div class="card-desc">Evaluate limits step by step — Symbolab</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.symbolab.com/solver/partial-derivative-calculator" target="_blank" rel="noopener">
+          <div class="card-emoji">∂</div>
+          <div class="card-body">
+            <div class="card-title">Partial Derivative Calculator</div>
+            <div class="card-desc">Multivariable partial differentiation — Symbolab</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.emathhelp.net/calculators/calculus-2/taylor-and-maclaurin-series-calculator/" target="_blank" rel="noopener">
+          <div class="card-emoji">Σ</div>
+          <div class="card-body">
+            <div class="card-title">Taylor & Maclaurin Series</div>
+            <div class="card-desc">Expand functions as power series — eMathHelp</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.symbolab.com/solver/double-integral-calculator" target="_blank" rel="noopener">
+          <div class="card-emoji">∬</div>
+          <div class="card-body">
+            <div class="card-title">Double Integral Calculator</div>
+            <div class="card-desc">Compute double integrals over regions — Symbolab</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://mathdf.com/dif/" target="_blank" rel="noopener">
+          <div class="card-emoji">📌</div>
+          <div class="card-body">
+            <div class="card-title">Maxima & Minima Finder</div>
+            <div class="card-desc">Find critical points and extreme values — MathDF</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- 3. Probability & Statistics -->
+    <div class="section s3" id="probability">
+      <div class="section-header">
+        <div class="section-icon">🎲</div>
+        <div class="section-title-group">
+          <h2>Probability & Distributions</h2>
+          <p>Binomial, Poisson, Normal, and statistical distributions</p>
+        </div>
+        <div class="section-divider"></div>
+      </div>
+      <div class="cards-grid">
+
+        <a class="card" href="https://stattrek.com/online-calculator/binomial" target="_blank" rel="noopener">
+          <div class="card-emoji">📊</div>
+          <div class="card-body">
+            <div class="card-title">Binomial Distribution Calculator</div>
+            <div class="card-desc">P(X=k) for binomial experiments — StatTrek</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://stattrek.com/online-calculator/poisson" target="_blank" rel="noopener">
+          <div class="card-emoji">⚡</div>
+          <div class="card-body">
+            <div class="card-title">Poisson Distribution Calculator</div>
+            <div class="card-desc">Probability of rare events over intervals — StatTrek</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://stattrek.com/online-calculator/normal" target="_blank" rel="noopener">
+          <div class="card-emoji">🔔</div>
+          <div class="card-body">
+            <div class="card-title">Normal Distribution Calculator</div>
+            <div class="card-desc">Z-scores, probabilities, bell curve — StatTrek</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/StatsCalc.aspx?q=mean" target="_blank" rel="noopener">
+          <div class="card-emoji">📋</div>
+          <div class="card-body">
+            <div class="card-title">Mean, Median & Mode</div>
+            <div class="card-desc">Descriptive statistics calculator — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/StatsCalc.aspx?q=corr" target="_blank" rel="noopener">
+          <div class="card-emoji">🔗</div>
+          <div class="card-body">
+            <div class="card-title">Correlation & Regression</div>
+            <div class="card-desc">Pearson correlation and linear regression — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://stattrek.com/online-calculator/hypergeometric" target="_blank" rel="noopener">
+          <div class="card-emoji">🃏</div>
+          <div class="card-body">
+            <div class="card-title">Hypergeometric Distribution</div>
+            <div class="card-desc">Sampling without replacement probability — StatTrek</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.statskingdom.com/410normal_distribution_calculator.html" target="_blank" rel="noopener">
+          <div class="card-emoji">📐</div>
+          <div class="card-body">
+            <div class="card-title">Standard Deviation & Variance</div>
+            <div class="card-desc">Population & sample statistics — StatsKingdom</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- 4. Linear Algebra -->
+    <div class="section s4" id="linear">
+      <div class="section-header">
+        <div class="section-icon">🧮</div>
+        <div class="section-title-group">
+          <h2>Linear Algebra & Matrices</h2>
+          <p>Matrix operations, eigenvalues, determinants and transformations</p>
+        </div>
+        <div class="section-divider"></div>
+      </div>
+      <div class="cards-grid">
+
+        <a class="card" href="https://matrix.reshish.com/" target="_blank" rel="noopener">
+          <div class="card-emoji">▦</div>
+          <div class="card-body">
+            <div class="card-title">Matrix Calculator</div>
+            <div class="card-desc">Add, multiply, transpose, inverse — matrix.reshish.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/MatrixCalc.aspx?q=det" target="_blank" rel="noopener">
+          <div class="card-emoji">det</div>
+          <div class="card-body">
+            <div class="card-title">Determinant Calculator</div>
+            <div class="card-desc">Compute determinant with steps — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.wolframalpha.com/widgets/view.jsp?id=9aa01caf50c9307e9dabe159c9068c41" target="_blank" rel="noopener">
+          <div class="card-emoji">λ</div>
+          <div class="card-body">
+            <div class="card-title">Eigenvalue & Eigenvector Calculator</div>
+            <div class="card-desc">Find eigenvalues and eigenvectors — WolframAlpha Widget</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/CONM/GaussElim.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">⬇️</div>
+          <div class="card-body">
+            <div class="card-title">Gaussian Elimination</div>
+            <div class="card-desc">Row reduction to solve linear systems — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/MatrixCalc.aspx?q=rank" target="_blank" rel="noopener">
+          <div class="card-emoji">↗️</div>
+          <div class="card-body">
+            <div class="card-title">Matrix Rank Calculator</div>
+            <div class="card-desc">Find rank using row echelon form — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.emathhelp.net/calculators/linear-algebra/lu-decomposition-calculator/" target="_blank" rel="noopener">
+          <div class="card-emoji">🔀</div>
+          <div class="card-body">
+            <div class="card-title">LU Decomposition</div>
+            <div class="card-desc">Factor matrix into lower and upper triangular — eMathHelp</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- 5. Ordinary Differential Equations -->
+    <div class="section s5" id="ode">
+      <div class="section-header">
+        <div class="section-icon">📉</div>
+        <div class="section-title-group">
+          <h2>Ordinary Differential Equations</h2>
+          <p>First and higher order ODE solvers with step-by-step solutions</p>
+        </div>
+        <div class="section-divider"></div>
+      </div>
+      <div class="cards-grid">
+
+        <a class="card" href="https://www.symbolab.com/solver/ordinary-differential-equation-calculator" target="_blank" rel="noopener">
+          <div class="card-emoji">📜</div>
+          <div class="card-body">
+            <div class="card-title">ODE Calculator (General)</div>
+            <div class="card-desc">Solve first & second order ODEs — Symbolab</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.emathhelp.net/calculators/differential-equations/separable-differential-equations-calculator/" target="_blank" rel="noopener">
+          <div class="card-emoji">🧩</div>
+          <div class="card-body">
+            <div class="card-title">Separable ODE Calculator</div>
+            <div class="card-desc">Solve separable differential equations — eMathHelp</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/CONM/Euler.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">🪜</div>
+          <div class="card-body">
+            <div class="card-title">Euler's Method</div>
+            <div class="card-desc">Numerical ODE solving step by step — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.emathhelp.net/calculators/differential-equations/linear-differential-equation-calculator/" target="_blank" rel="noopener">
+          <div class="card-emoji">📐</div>
+          <div class="card-body">
+            <div class="card-title">Linear ODE Calculator</div>
+            <div class="card-desc">First-order linear differential equations — eMathHelp</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.wolframalpha.com/input?i=solve+ODE" target="_blank" rel="noopener">
+          <div class="card-emoji">🌐</div>
+          <div class="card-body">
+            <div class="card-title">WolframAlpha ODE Solver</div>
+            <div class="card-desc">Powerful CAS ODE solving with graphs — WolframAlpha</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- 6. Transforms & Complex Analysis -->
+    <div class="section s6" id="transforms">
+      <div class="section-header">
+        <div class="section-icon">🌊</div>
+        <div class="section-title-group">
+          <h2>Transforms & Complex Analysis</h2>
+          <p>Laplace, Fourier, Z-Transform and complex number tools</p>
+        </div>
+        <div class="section-divider"></div>
+      </div>
+      <div class="cards-grid">
+
+        <a class="card" href="https://www.symbolab.com/solver/laplace-calculator" target="_blank" rel="noopener">
+          <div class="card-emoji">ℒ</div>
+          <div class="card-body">
+            <div class="card-title">Laplace Transform Calculator</div>
+            <div class="card-desc">Compute Laplace transforms step by step — Symbolab</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.symbolab.com/solver/inverse-laplace-calculator" target="_blank" rel="noopener">
+          <div class="card-emoji">ℒ⁻¹</div>
+          <div class="card-body">
+            <div class="card-title">Inverse Laplace Transform</div>
+            <div class="card-desc">Recover time-domain functions — Symbolab</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.emathhelp.net/calculators/differential-equations/fourier-series-calculator/" target="_blank" rel="noopener">
+          <div class="card-emoji">〜</div>
+          <div class="card-body">
+            <div class="card-title">Fourier Series Calculator</div>
+            <div class="card-desc">Expand periodic functions as Fourier series — eMathHelp</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.wolframalpha.com/input?i=Z+transform" target="_blank" rel="noopener">
+          <div class="card-emoji">Z</div>
+          <div class="card-body">
+            <div class="card-title">Z-Transform Calculator</div>
+            <div class="card-desc">Discrete-time signal analysis — WolframAlpha</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://www.symbolab.com/solver/complex-number-calculator" target="_blank" rel="noopener">
+          <div class="card-emoji">𝑖</div>
+          <div class="card-body">
+            <div class="card-title">Complex Number Calculator</div>
+            <div class="card-desc">Operations on complex numbers — Symbolab</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+        <a class="card" href="https://atozmath.com/CONM/DFT.aspx" target="_blank" rel="noopener">
+          <div class="card-emoji">📡</div>
+          <div class="card-body">
+            <div class="card-title">DFT / FFT Calculator</div>
+            <div class="card-desc">Discrete Fourier Transform with steps — AtoZmath.com</div>
+          </div>
+          <span class="card-arrow">→</span>
+        </a>
+
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    Built for Engineering Mathematics students &mdash; All links open external calculators in a new tab &mdash;
+    <a href="https://atozmath.com" target="_blank">AtoZmath</a> &middot;
+    <a href="https://symbolab.com" target="_blank">Symbolab</a> &middot;
+    <a href="https://wolframalpha.com" target="_blank">WolframAlpha</a> &middot;
+    <a href="https://emathhelp.net" target="_blank">eMathHelp</a>
+  </footer>
+
+  <script>
+    // Intersection Observer for scroll animation
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('.section').forEach(s => observer.observe(s));
+
+    // Search functionality
+    const searchInput = document.getElementById('search');
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase().trim();
+      document.querySelectorAll('.card').forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.classList.toggle('hidden', query !== '' && !text.includes(query));
+      });
+      document.querySelectorAll('.section').forEach(section => {
+        const visibleCards = section.querySelectorAll('.card:not(.hidden)');
+        section.classList.toggle('empty', query !== '' && visibleCards.length === 0);
+        if (query === '') section.classList.remove('empty');
+      });
+    });
+  </script>
+
+</body>
+</html>
